@@ -8,16 +8,12 @@ app = tk.Tk()
 app.title("Bookstore Management Database")
 
 
-
 c.execute("""CREATE TABLE IF NOT EXISTS author ( 
 author_id INTEGER PRIMARY KEY,
 author_firstname TEXT,
 author_lastname TEXT)""")
 
-#duplicats maybe take primary key, on authour showed up twice, delete duplicated 
-
-
-
+#duplicates 
 
 multiple_authors = [(1,'Rowling','J.K.'),
 (2,'Collins','Suzanne'), (3,'Beaton','Kate'),
