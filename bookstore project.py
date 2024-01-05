@@ -14,6 +14,7 @@ author_id INTEGER PRIMARY KEY,
 author_firstname TEXT,
 author_lastname TEXT)""")
 
+#duplicates 
 
 multiple_authors = [(1,'Rowling','J.K.'),
 (2,'Collins','Suzanne'), (3,'Beaton','Kate'),
@@ -71,7 +72,6 @@ multiple_books = [(1,'The Lord of the Rings:The Fellowship of the Ring',\
 
 c.executemany("INSERT or IGNORE INTO books ('book_id','book_title','genre','cover_type','price') VALUES(?,?,?,?,?)",multiple_books)
 
-#Update books table to add publishd year and cost columns
 update_info = "UPDATE books SET published_year = ?,cost = ? WHERE book_id = ?"
 
 years_for_books = {
@@ -107,6 +107,9 @@ years_for_books = {
     30:(2000,14.00),
     31:(2008,21.20)
 }
+
+for book_id, (year,cost) in years_for_books.items():
+    c.execute(update_info, (year,cost, book_id))
 
 
 
@@ -307,7 +310,6 @@ LEFT JOIN
     WHERE cust_name='Kevin'""")
 total_price_kevin=c.fetchone()[2]
 print(total_price_kevin)
-
 #Looking at the customers table, Jim bought 1 book and 2 accessories.
 price_accessories=c.execute("""SELECT customers.cust_id,
     customers.cust_name,
@@ -411,16 +413,23 @@ print(total_amount_paid)
 total_profit=total_amount_paid-total_costs
 print(total_profit)
 
-#Display a message box with informaton about profits, revenue and costs
+
+
+
+
+#create a message box showing informaton about profits, revenue, and costs
+
 
 def show_total_profits():
     total_profit = total_amount_paid - total_costs
     messagebox.showinfo("Total Profits", f"Total Profits: {total_profit}")
 def show_total_revenue():
     total_revenue=total_amount_paid
-    messagebox.showinfo("Total Revenue", f"Total Revenue: {total_revenue}")    
+    messagebox.showinfo("Total Revenue", f"Total Profits: {total_revenue}")    
 def show_total_costs():
     messagebox.showinfo("Total Costs", f"Total Costs: {total_costs}")
+
+
 
 # Create buttons for total costs and profits
 btn_show_total_costs = tk.Button(app, text="Show Total Costs", command=show_total_costs)
@@ -433,10 +442,11 @@ btn_show_total_profits = tk.Button(app, text="Show Total Revenue", command=show_
 btn_show_total_profits.pack()
 
 
+
 # Run the application loop
 app.mainloop()
 
-#save changes and close connection
+
 connection.commit()
 connection.close()
 
