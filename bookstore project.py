@@ -7,13 +7,13 @@ c = connection.cursor()
 app = tk.Tk()
 app.title("Bookstore Management Database")
 
+#create a table of authors 
 
 c.execute("""CREATE TABLE IF NOT EXISTS author ( 
 author_id INTEGER PRIMARY KEY,
 author_firstname TEXT,
 author_lastname TEXT)""")
 
-#duplicates 
 
 multiple_authors = [(1,'Rowling','J.K.'),
 (2,'Collins','Suzanne'), (3,'Beaton','Kate'),
@@ -35,6 +35,8 @@ c.executemany("INSERT or IGNORE INTO author VALUES(?,?,?)",multiple_authors)
 c.execute("""SELECT author_firstname,author_lastname
 FROM author
 ORDER BY author_lastname ASC""")
+
+#create a table of books 
 
 c.execute("""DROP TABLE IF EXISTS books""")
 
@@ -69,10 +71,7 @@ multiple_books = [(1,'The Lord of the Rings:The Fellowship of the Ring',\
 
 c.executemany("INSERT or IGNORE INTO books ('book_id','book_title','genre','cover_type','price') VALUES(?,?,?,?,?)",multiple_books)
 
-
-
-
-
+#Update books table to add publishd year and cost columns
 update_info = "UPDATE books SET published_year = ?,cost = ? WHERE book_id = ?"
 
 years_for_books = {
@@ -109,12 +108,6 @@ years_for_books = {
     31:(2008,21.20)
 }
 
-for book_id, (year,cost) in years_for_books.items():
-    c.execute(update_info, (year,cost, book_id))
-
-
-
-#A customer asked for all books written by J.K. Rowling, lets 
 
 
 #Find all books that are hardcover published after 2010
@@ -149,7 +142,7 @@ multiple_items=[(31,'bookmark', 2.50,1.00),(32,'bookmark', 2.50,1.00),(33,'water
 c.executemany("INSERT or IGNORE INTO accessories VALUES(?,?,?,?)",multiple_items)
 
 
-#DElete duplicates so accessories are unique 
+#Delete duplicates so accessories are unique 
 
 c.execute("""DELETE FROM accessories
 WHERE item_id NOT IN (
@@ -161,10 +154,9 @@ WHERE item_id NOT IN (
 
 
 
-#show how many copies of each book there is, take id of primary key like tabe storage number of copies and book id create  a table to show parent child relatonships foreign key, 
+#create a table of customers 
 
 c.execute("""DROP TABLE IF EXISTS customers""")
-#this is parent table
 c.execute("""CREATE TABLE IF NOT EXISTS customers ( 
 cust_id INTEGER PRIMARY KEY,
 cust_name TEXT,
@@ -172,7 +164,7 @@ num_books INTEGER,
 num_accessories INTEGER,
 regular_status BOOLEAN CHECK (regular_status IN (0, 1)))""")   
 
-
+#create a table of books bought by customers
 c.execute("""DROP TABLE IF EXISTS books_bought""")
 c.execute("""CREATE TABLE IF NOT EXISTS books_bought (
 cust_id INTEGER,
@@ -210,6 +202,7 @@ c.execute("""INSERT INTO books_bought (cust_id, book_id, book_title) VALUES
     (1, 25, 'The Humans')""")
 c.execute("""INSERT INTO books_bought (cust_id, book_id, book_title) VALUES (1, 12, "Pug's Snow Day")""")
 
+#create a table of accessories bought by customers 
 c.execute("""DROP TABLE IF EXISTS accessories_bought""")
 c.execute("""CREATE TABLE IF NOT EXISTS accessories_bought (
     cust_id INTEGER,
@@ -269,7 +262,7 @@ INNER JOIN
 accessories_bought
 ON accessories_bought.cust_id=books_bought.cust_id""")
 
-#calculate the total price paid per customer including HST 
+#calculate the total price paid per customer including HST using joins
 
 #Looking at the customers table, Pam bought 2 books and no accessories.
 
@@ -314,6 +307,7 @@ LEFT JOIN
     WHERE cust_name='Kevin'""")
 total_price_kevin=c.fetchone()[2]
 print(total_price_kevin)
+
 #Looking at the customers table, Jim bought 1 book and 2 accessories.
 price_accessories=c.execute("""SELECT customers.cust_id,
     customers.cust_name,
@@ -384,7 +378,7 @@ total_price_jim= (total_books_price + total_accessories_price)*1.13
 # Print or use the total price
 print("Total amount spent by Jim:", total_price_jim)
 
-#Create table of total amount paid 
+
 
 #total cost of books bought 
 
@@ -417,24 +411,16 @@ print(total_amount_paid)
 total_profit=total_amount_paid-total_costs
 print(total_profit)
 
-
-
-
-
-
-def show_total_costs():
-    c.execute("SELECT SUM(cost) FROM books UNION ALL SELECT SUM(cost) FROM accessories")
-    total_costs = c.fetchone()[0]
-    messagebox.showinfo("Total Costs", f"Total Costs: {total_costs}")
+#Display a message box with informaton about profits, revenue and costs
 
 def show_total_profits():
-    # Assume total_amount_paid and total_costs are available
     total_profit = total_amount_paid - total_costs
     messagebox.showinfo("Total Profits", f"Total Profits: {total_profit}")
+def show_total_revenue():
+    total_revenue=total_amount_paid
+    messagebox.showinfo("Total Revenue", f"Total Revenue: {total_revenue}")    
 def show_total_costs():
     messagebox.showinfo("Total Costs", f"Total Costs: {total_costs}")
-
-
 
 # Create buttons for total costs and profits
 btn_show_total_costs = tk.Button(app, text="Show Total Costs", command=show_total_costs)
@@ -443,12 +429,14 @@ btn_show_total_costs.pack()
 btn_show_total_profits = tk.Button(app, text="Show Total Profits", command=show_total_profits)
 btn_show_total_profits.pack()
 
+btn_show_total_profits = tk.Button(app, text="Show Total Revenue", command=show_total_revenue)
+btn_show_total_profits.pack()
 
 
 # Run the application loop
 app.mainloop()
 
-
+#save changes and close connection
 connection.commit()
 connection.close()
 
