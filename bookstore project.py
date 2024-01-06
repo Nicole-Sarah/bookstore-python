@@ -425,7 +425,7 @@ def show_total_profits():
     messagebox.showinfo("Total Profits", f"Total Profits: {total_profit}")
 def show_total_revenue():
     total_revenue=total_amount_paid
-    messagebox.showinfo("Total Revenue", f"Total Profits: {total_revenue}")    
+    messagebox.showinfo("Total Revenue", f"Total Revenue: {total_revenue}")    
 def show_total_costs():
     messagebox.showinfo("Total Costs", f"Total Costs: {total_costs}")
 
@@ -449,7 +449,6 @@ app.mainloop()
 
 connection.commit()
 connection.close()
-
 
 
 
